@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spore Farm</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;700;800&display=swap">
+<style>
+:root{--bg:#2a1b3d;--panel:#3a2753;--ink:#f5efe6;--mute:#bfaedb;--moss:#7fb069;--amber:#f2a541;--cap:#e4572e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#efe8f7;--panel:#fff;--ink:#2a1b3d;--mute:#6a5a85;--moss:#3f7d2c;--amber:#b86d00;--cap:#d1431c;color-scheme:light}}
+:root[data-theme="dark"]{--bg:#2a1b3d;--panel:#3a2753;--ink:#f5efe6;--mute:#bfaedb;--moss:#7fb069;--amber:#f2a541;--cap:#e4572e}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.4 "Bricolage Grotesque",system-ui,sans-serif;min-height:100vh}
+main{max-width:920px;margin:0 auto;padding:24px 16px 48px;display:grid;gap:24px;grid-template-columns:1fr}
+@media(min-width:760px){main{grid-template-columns:1.1fr 1fr;align-items:start}}
+h1{font-weight:800;font-size:clamp(2rem,6vw,3rem);margin:0;letter-spacing:-.02em}
+.stage{text-align:center;overflow-x:clip}
+.bullet{position:absolute;width:16px;height:4px;border-radius:2px;background:var(--amber);pointer-events:none;animation:bullet .35s linear forwards}
+@keyframes bullet{to{transform:translateX(280px);opacity:0}}
+.count{font-weight:800;font-size:clamp(2.6rem,10vw,4.5rem);line-height:1;margin:16px 0 4px;font-variant-numeric:tabular-nums}
+.rate{color:var(--mute);margin:0 0 8px}
+#shroom{position:relative;background:none;border:0;cursor:pointer;padding:12px;border-radius:50%;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#shroom svg{width:min(70vw,300px);height:auto;transition:transform .08s}
+#shroom:active svg{transform:scale(.94) rotate(-2deg)}
+#shroom:focus-visible,.up:focus-visible,#reset:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+.pop{position:absolute;pointer-events:none;font-weight:800;color:var(--amber);animation:pop .8s ease-out forwards}
+@keyframes pop{to{transform:translateY(-70px);opacity:0}}
+.shop{display:grid;gap:10px}
+.shop h2{margin:0 0 4px;font-size:1.1rem}
+.up{display:grid;grid-template-columns:1fr auto;gap:2px 12px;text-align:left;background:var(--panel);color:var(--ink);border:2px solid transparent;border-radius:14px;padding:12px 14px;font:inherit;cursor:pointer}
+.up:disabled{opacity:.5;cursor:not-allowed}
+.up:not(:disabled):hover{border-color:var(--moss)}
+.up b{font-weight:700}.up .own{color:var(--amber);font-weight:800;font-size:1.3rem;grid-row:span 2;align-self:center}
+.up small{color:var(--mute)}
+#reset{margin-top:8px;background:none;border:0;color:var(--mute);font:inherit;text-decoration:underline;cursor:pointer;justify-self:start}
+.codes{background:var(--panel);border-radius:14px;padding:12px 14px;display:grid;gap:8px}
+.about dl{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;margin:0}
+.about dt{color:var(--mute)}
+.about dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums}
+#story{display:grid;gap:8px}
+#story details{background:var(--bg);border-radius:10px;padding:8px 12px}
+#story summary{cursor:pointer;font-weight:700}
+#story summary:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+#story details p{margin:8px 0 2px;line-height:1.5;max-width:62ch}
+.skinrow{display:flex;flex-wrap:wrap;gap:8px}
+.skin{display:flex;align-items:center;gap:8px;background:var(--bg);color:var(--ink);border:2px solid transparent;border-radius:12px;padding:6px 10px;font:inherit;cursor:pointer}
+.skin[aria-pressed="true"]{border-color:var(--amber)}
+.skin:disabled{opacity:.5;cursor:not-allowed}
+.skin:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.skin .sw{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink);flex:none}
+#rebirth{background:var(--amber);color:#1b1226;border:0;border-radius:10px;padding:8px 16px;font-family:inherit;font-weight:700;font-size:1rem;cursor:pointer;justify-self:start}
+#rebirth:disabled{opacity:.5;cursor:not-allowed}
+#rebirth:focus-visible{outline:3px solid var(--moss);outline-offset:2px}
+.codes p.note{margin:0;color:var(--mute);font-size:.95rem}
+.codes h2{margin:0;font-size:1.1rem}
+.codes .row{display:flex;gap:8px}
+.codes input{flex:1;min-width:0;background:var(--bg);color:var(--ink);border:2px solid var(--mute);border-radius:10px;padding:8px 10px;font:inherit;text-transform:uppercase}
+.codes input:focus-visible,#redeem:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+#redeem{background:var(--moss);color:#1b1226;border:0;border-radius:10px;padding:8px 16px;font:700 1rem inherit;font-family:inherit;cursor:pointer}
+#codemsg{margin:0;min-height:1.4em;color:var(--mute);font-size:.95rem}
+#codemsg.ok{color:var(--moss)}#codemsg.bad{color:var(--cap)}
+@media(prefers-reduced-motion:reduce){.bullet{animation:none;opacity:0}.pop{animation:none;opacity:0}#shroom svg{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<section class="stage">
+<h1>Spore Farm</h1>
+<div class="count" id="count" aria-live="off">0</div>
+<p class="rate"><span id="rate">0</span> spores per second</p>
+<button id="shroom" aria-label="Harvest spores">
+<svg viewBox="0 0 200 200" aria-hidden="true">
+<ellipse cx="100" cy="186" rx="62" ry="9" fill="#000" opacity=".25"/>
+<path d="M78 110h44l6 70c0 6-10 10-28 10s-28-4-28-10z" fill="var(--mstem,#f5efe6)"/>
+<circle cx="90" cy="144" r="4" fill="#2a1b3d"/><circle cx="110" cy="144" r="4" fill="#2a1b3d"/>
+<circle cx="83" cy="156" r="5" fill="#f2a0a0" opacity=".7"/><circle cx="117" cy="156" r="5" fill="#f2a0a0" opacity=".7"/>
+<path d="M89 155q11 12 22 0" fill="none" stroke="#2a1b3d" stroke-width="3.5" stroke-linecap="round"/>
+<g id="held" style="display:none">
+<path d="M44 176L70 168V180L48 186Z" fill="#8a5a2b"/>
+<path d="M90 176q4 16 14 18l6-3q-8-4-8-15z" fill="#1a1a1a"/>
+<rect x="70" y="166" width="54" height="10" rx="2" fill="#2b2b2b"/>
+<rect x="108" y="166" width="24" height="9" rx="2" fill="#8a5a2b"/>
+<rect x="132" y="169" width="40" height="4" fill="#1a1a1a"/>
+<rect x="166" y="166" width="3" height="4" fill="#1a1a1a"/>
+<circle cx="92" cy="171" r="5" fill="var(--mstem,#f5efe6)"/><circle cx="120" cy="171" r="5" fill="var(--mstem,#f5efe6)"/>
+<g id="flash" style="display:none"><path d="M170 171l16-9-6 9 6 9z" fill="#ffd23f"/><circle cx="175" cy="171" r="5" fill="#fff"/></g>
+</g>
+<path d="M14 112C14 52 54 14 100 14s86 38 86 98c0 10-16 14-86 14S14 122 14 112z" fill="var(--mcap,#e4572e)"/>
+<circle cx="62" cy="62" r="14" fill="var(--mspot,#f5efe6)"/><circle cx="118" cy="42" r="9" fill="var(--mspot,#f5efe6)"/>
+<circle cx="150" cy="84" r="12" fill="var(--mspot,#f5efe6)"/><circle cx="96" cy="88" r="8" fill="var(--mspot,#f5efe6)"/>
+<circle cx="40" cy="100" r="6" fill="var(--mspot,#f5efe6)"/>
+</svg>
+</button>
+</section>
+<section class="shop">
+<h2>Grow the farm</h2>
+<div id="shop" class="shop"></div>
+<div class="codes about">
+<h2>About the mushroom</h2>
+<p class="note">Pip is a small, cheerful mushroom who lives beside Lake Rebus. Pip loves being tapped, grows a little every time, and has a habit of starting over with a smile.</p>
+<dl>
+<dt>Rebirths</dt><dd id="ab-rebirths"></dd>
+<dt>Spirit</dt><dd id="ab-spirit"></dd>
+<dt>Skin</dt><dd id="ab-skin"></dd>
+<dt>Spores per click</dt><dd id="ab-click"></dd>
+<dt>Spores per second</dt><dd id="ab-sec"></dd>
+<dt>Earned this run</dt><dd id="ab-total"></dd>
+</dl>
+</div>
+<div class="codes">
+<h2>Story</h2>
+<div id="story"></div>
+</div>
+<div class="codes">
+<h2>Skins</h2>
+<div id="skins" class="skinrow"></div>
+</div>
+<div class="codes">
+<h2>Rebirth</h2>
+<p class="note" id="spiritinfo"></p>
+<p class="note" id="rebirthinfo"></p>
+<button id="rebirth">Rebirth</button>
+</div>
+<div class="codes">
+<h2>Redeem a code</h2>
+<div class="row"><input id="codein" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Enter code" aria-label="Code"><button id="redeem">Redeem</button></div>
+<p id="codemsg" role="status"></p>
+</div>
+<button id="reset">Reset progress</button>
+</section>
+</main>
+<script>
+(function(){
+var UPS=[
+{id:'gloves',name:'Picking gloves',desc:'+1 spore per click',cost:15,click:1},
+{id:'log',name:'Oak log',desc:'+1 spore per second',cost:50,sec:1},
+{id:'compost',name:'Compost heap',desc:'+3 spores per second',cost:150,sec:3},
+{id:'tongs',name:'Bamboo tongs',desc:'+5 spores per click',cost:250,click:5},
+{id:'cellar',name:'Damp cellar',desc:'+8 spores per second',cost:400,sec:8},
+{id:'greenhouse',name:'Greenhouse',desc:'+25 spores per second',cost:1500,sec:25},
+{id:'mycelium',name:'Mycelium network',desc:'+50 spores per second',cost:3000,sec:50},
+{id:'scythe',name:'Silver scythe',desc:'+20 spores per click',cost:5000,click:20},
+{id:'mist',name:'Mist machine',desc:'+60 spores per second',cost:8000,sec:60},
+{id:'lamps',name:'Grow lamps',desc:'+120 spores per second',cost:12000,sec:120},
+{id:'ferment',name:'Fermenter',desc:'+250 spores per second',cost:20000,sec:250},
+{id:'lab',name:'Spore lab',desc:'+400 spores per second',cost:40000,sec:400},
+{id:'glove2',name:'Gene-spliced gloves',desc:'+500 spores per click',cost:60000,click:500},
+{id:'harvester',name:'Robot harvester',desc:'+150 spores per click',cost:90000,click:150},
+{id:'forest',name:'Ancient forest',desc:'+2,000 spores per second',cost:250000,sec:2000},
+{id:'moon',name:'Moon cellar',desc:'+10,000 spores per second',cost:1500000,sec:10000},
+{id:'qtongs',name:'Quantum tongs',desc:'+5,000 spores per click',cost:4000000,click:5000},
+{id:'drones',name:'Spore drones',desc:'+50,000 spores per second',cost:12000000,sec:50000},
+{id:'city',name:'Mushroom city',desc:'+300,000 spores per second',cost:80000000,sec:300000},
+{id:'orbit',name:'Orbital farm',desc:'+60,000 spores per click',cost:250000000,click:60000},
+{id:'ai',name:'Mycelium mind',desc:'+2,000,000 spores per second',cost:1000000000,sec:2000000},
+{id:'portal',name:'Spore portal',desc:'+15,000,000 spores per second',cost:12000000000,sec:15000000}
+];
+var s={spores:0,own:{},total:0,spirit:0,skin:'classic',rebirths:0};
+try{var raw=localStorage.getItem('sporefarm');if(raw){var p=JSON.parse(raw);if(p&&typeof p.spores==='number'){s=p;s.own=s.own||{};s.total=s.total||0;s.spirit=s.spirit||0;s.skin=s.skin||'classic';s.rebirths=s.rebirths||(s.spirit>0?1:0)}}}catch(e){}
+function cost(u){return Math.ceil(u.cost*Math.pow(1.15,s.own[u.id]||0))}
+function mult(){return 1+0.1*s.spirit}
+function gain(){return Math.floor(Math.sqrt(s.total/1e6))}
+function perClick(){return Math.max(1,Math.round(mult()*UPS.reduce(function(a,u){return a+(u.click||0)*(s.own[u.id]||0)},1)))}
+function perSec(){return mult()*UPS.reduce(function(a,u){return a+(u.sec||0)*(s.own[u.id]||0)},0)}
+function fmt(n){n=Math.floor(n);if(n>=1e12)return (n/1e12).toFixed(2)+'T';if(n>=1e9)return (n/1e9).toFixed(2)+'B';if(n>=1e6)return (n/1e6).toFixed(2)+'M';if(n>=1e4)return (n/1e3).toFixed(1)+'k';return n.toLocaleString('en-US')}
+var SKINS=[
+{id:'classic',name:'Classic',cap:'#e4572e',spot:'#f5efe6',stem:'#f5efe6',need:0},
+{id:'blue',name:'Blue cap',cap:'#3b6fe0',spot:'#f5efe6',stem:'#f5efe6',need:0},
+{id:'moss',name:'Moss',cap:'#5f9e4f',spot:'#e8f5c8',stem:'#e8f5c8',need:0},
+{id:'golden',name:'Golden',cap:'#f2b705',spot:'#fff3b0',stem:'#fff3b0',need:1},
+{id:'toadstool',name:'Toadstool',cap:'#8e44ad',spot:'#f7c6ff',stem:'#f0e6f6',need:2},
+{id:'ghost',name:'Ghost',cap:'#cfd8e8',spot:'#ffffff',stem:'#f5f8ff',need:3},
+{id:'ember',name:'Ember',cap:'#c0392b',spot:'#ffb347',stem:'#ffe0b2',need:5},
+{id:'midnight',name:'Midnight',cap:'#1b1b4b',spot:'#7df9ff',stem:'#cfe8ff',need:8},
+{id:'neonshadow',name:'Neon Shadow',cap:'#121212',spot:'#39ff88',stem:'#d8d8d8',need:0,held:true}
+];
+var skinRow=document.getElementById('skins'),skinBtns={};
+SKINS.forEach(function(k){var b=document.createElement('button');b.className='skin';b.innerHTML='<span class="sw"></span><span class="nm"></span>';b.querySelector('.sw').style.background=k.cap;b.onclick=function(){if(s.spirit>=k.need){s.skin=k.id;updateSkins();save()}};skinRow.appendChild(b);skinBtns[k.id]=b});
+function updateSkins(){
+var cur=SKINS.filter(function(k){return k.id===s.skin})[0];
+if(!cur||s.spirit<cur.need){cur=SKINS[0];s.skin=cur.id}
+var el=document.getElementById('shroom');
+document.getElementById('held').style.display=cur.held?'':'none';
+el.style.setProperty('--mcap',cur.cap);el.style.setProperty('--mspot',cur.spot);el.style.setProperty('--mstem',cur.stem);
+SKINS.forEach(function(k){var b=skinBtns[k.id],locked=s.spirit<k.need;b.disabled=locked;b.setAttribute('aria-pressed',String(k.id===cur.id));b.querySelector('.nm').textContent=k.name+(locked?' (needs '+k.need+' spirit)':'')});
+}
+var CHAPTERS=[
+{title:'Prologue: The first spore',text:'A single spore drifted down beside Lake Rebus. Nobody saw it land. Then someone tapped it, and it began to grow.'},
+{title:'Chapter 1: The cap falls',text:'The first rebirth felt like autumn. Pip’s cap crumbled into the soil, and a quiet voice beneath the roots said, “Again. Grow again.”'},
+{title:'Chapter 2: Old Mycelia',text:'Deep under the farm lived Old Mycelia, a web of white threads older than the lake. She had been waiting for someone who would keep coming back.'},
+{title:'Chapter 3: The lake remembers',text:'Pip walked to the water’s edge and saw a hundred small caps reflected there. Each one was a past life, glowing faintly in the ripples.'},
+{title:'Chapter 4: The hungry winter',text:'Frost took the oak logs and the cellar went silent. Pip learned that starting over is easier when you remember what worked.'},
+{title:'Chapter 5: Moths at midnight',text:'Pale moths carried spores between the farms of the valley. They told Pip that every mushroom there had once been a stranger’s first click.'},
+{title:'Chapter 6: The rebus stone',text:'On the shore sat a stone carved with pictures instead of words: a cap, a drop of water, an arrow turning back. Old Mycelia said it spelled “rebirth”.'},
+{title:'Chapter 7: Roots to the moon',text:'The moon cellar hummed, and the threads of Old Mycelia reached upward. For one night, the whole valley grew in silver light.'},
+{title:'Chapter 8: The crowded forest',text:'The ancient forest filled with new faces. Pip noticed they all smiled the same way, and realized the smile had been Pip’s own idea.'},
+{title:'Chapter 9: What the portal wanted',text:'The spore portal opened, and nothing dangerous came through. It only wanted to ask how many times Pip had begun again, and to say thank you.'},
+{title:'Chapter 10: The ring at the lake',text:'At last the mushrooms grew in a perfect ring around Lake Rebus. Pip understood that the ring had no end, only a place to start again, and was glad.'}
+];
+function updateAbout(){
+var cur=SKINS.filter(function(k){return k.id===s.skin})[0]||SKINS[0];
+document.getElementById('ab-rebirths').textContent=s.rebirths||0;
+document.getElementById('ab-spirit').textContent=s.spirit;
+document.getElementById('ab-skin').textContent=cur.name;
+document.getElementById('ab-click').textContent=fmt(perClick());
+document.getElementById('ab-sec').textContent=fmt(perSec());
+document.getElementById('ab-total').textContent=fmt(s.total);
+}
+function buildStory(){
+var box=document.getElementById('story');box.innerHTML='';
+var n=Math.min(s.rebirths||0,CHAPTERS.length-1);
+for(var i=n;i>=0;i--){var d=document.createElement('details'),sm=document.createElement('summary'),p=document.createElement('p');
+sm.textContent=CHAPTERS[i].title;p.textContent=CHAPTERS[i].text;d.appendChild(sm);d.appendChild(p);if(i===n)d.open=true;box.appendChild(d)}
+var note=document.createElement('p');note.style.cssText='margin:0;color:var(--mute);font-size:.95rem';
+note.textContent=n<CHAPTERS.length-1?'The next chapter unlocks with your next rebirth.':'The tale is complete, for now.';box.appendChild(note);
+}
+buildStory();
+var shop=document.getElementById('shop'),btns={};
+UPS.forEach(function(u){
+var b=document.createElement('button');b.className='up';
+b.innerHTML='<b>'+u.name+'</b><span class="own"></span><small></small>';
+b.onclick=function(){var c=cost(u);if(s.spores>=c){s.spores-=c;s.own[u.id]=(s.own[u.id]||0)+1;render();save()}};
+shop.appendChild(b);btns[u.id]=b;
+});
+function render(){
+var g=gain();
+updateSkins();updateAbout();
+document.getElementById('spiritinfo').textContent='Spirit: '+s.spirit+' (+'+Math.round(s.spirit*10)+'% to all spores)';
+document.getElementById('rebirthinfo').textContent=g>0?'Rebirth now to gain '+g+' spirit. This resets spores and upgrades.':'Earn '+fmt(1e6)+' spores in one run to unlock your first spirit. This run: '+fmt(s.total)+'.';
+document.getElementById('rebirth').disabled=g<1;
+document.getElementById('count').textContent=fmt(s.spores);
+document.getElementById('rate').textContent=fmt(perSec());
+UPS.forEach(function(u){var b=btns[u.id],c=cost(u);
+b.disabled=s.spores<c;
+b.querySelector('.own').textContent=s.own[u.id]||0;
+b.querySelector('small').textContent=u.desc+' · '+fmt(c)+' spores';
+});
+}
+function save(){try{localStorage.setItem('sporefarm',JSON.stringify(s))}catch(e){}}
+function shoot(){
+if(s.skin!=='neonshadow')return;
+var held=document.getElementById('held'),fl=document.getElementById('flash'),svg=sh.querySelector('svg');
+fl.style.display='';setTimeout(function(){fl.style.display='none'},70);
+if(window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+held.animate([{transform:'translateX(-6px)'},{transform:'translateX(0)'}],{duration:90});
+var a=svg.getBoundingClientRect(),b=sh.getBoundingClientRect();
+var bl=document.createElement('span');bl.className='bullet';
+bl.style.left=(a.left-b.left+a.width*176/200)+'px';bl.style.top=(a.top-b.top+a.height*171/200-2)+'px';
+sh.appendChild(bl);setTimeout(function(){bl.remove()},360);
+}
+var sh=document.getElementById('shroom');
+sh.addEventListener('click',function(e){
+var n=perClick();s.spores+=n;s.total+=n;render();shoot();
+var r=sh.getBoundingClientRect(),el=document.createElement('span');
+el.className='pop';el.textContent='+'+n;
+var x=e.clientX?e.clientX-r.left:r.width/2,y=e.clientY?e.clientY-r.top:r.height/2;
+el.style.left=x+'px';el.style.top=y+'px';sh.appendChild(el);
+setTimeout(function(){el.remove()},800);
+});
+var last=Date.now(),tick=0;
+setInterval(function(){var t=Date.now();var gn=perSec()*(t-last)/1000;s.spores+=gn;s.total+=gn;last=t;render();if(++tick%20===0)save()},100);
+var CODES={HELLO:100,LOGCABIN:2500,TRUFFLE:50000,MYCELIUM:1000000,BILLION:1000000000,LAKEREBUS:5000000};
+function redeem(){
+var inp=document.getElementById('codein'),msg=document.getElementById('codemsg');
+var c=inp.value.trim().toUpperCase().replace(/\s+/g,'');
+if(!c){msg.className='bad';msg.textContent='Type a code first.';return}
+s.codes=s.codes||{};
+if(!Object.prototype.hasOwnProperty.call(CODES,c)){msg.className='bad';msg.textContent='That code does not work. Check the spelling.';return}
+if(s.codes[c]){msg.className='bad';msg.textContent='You already used '+c+'.';return}
+s.codes[c]=1;s.spores+=CODES[c];render();save();inp.value='';
+msg.className='ok';msg.textContent='Redeemed '+c+': +'+fmt(CODES[c])+' spores.';
+}
+document.getElementById('redeem').onclick=redeem;
+document.getElementById('rebirth').onclick=function(){var g=gain();if(g<1)return;if(confirm('Rebirth for '+g+' spirit? Spores and upgrades reset; spirit and used codes stay.')){s.spirit+=g;s.rebirths=(s.rebirths||0)+1;s.spores=0;s.own={};s.total=0;buildStory();render();save()}};
+document.getElementById('codein').addEventListener('keydown',function(e){if(e.key==='Enter')redeem()});
+document.getElementById('reset').onclick=function(){if(confirm('Reset all progress?')){s={spores:0,own:{},total:0,spirit:0,skin:'classic',rebirths:0};buildStory();render();save()}};
+render();
+})();
+</script>
+</body>
+</html>
